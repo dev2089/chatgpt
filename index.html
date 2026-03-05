@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeBuilder AI - Free Unlimited Website Creator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>VibeBuilder AI</h1>
+      <p class="subtitle">Build websites with AI, edit everything, preview instantly, and publish free with no limits.</p>
+    </div>
+    <div class="actions">
+      <button id="generateBtn">✨ Generate with AI</button>
+      <button id="previewBtn">▶ Live Preview</button>
+      <button id="publishBtn">🚀 Publish</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel files">
+      <div class="panel-title">Project Files</div>
+      <ul id="fileList"></ul>
+      <div class="file-actions">
+        <button id="newFileBtn">+ New File</button>
+        <button id="deleteFileBtn">🗑 Delete File</button>
+      </div>
+    </section>
+
+    <section class="panel editor">
+      <div class="panel-title">Code Editor</div>
+      <label for="promptInput">AI Prompt (e.g. "Landing page for a coffee shop")</label>
+      <textarea id="promptInput" class="prompt" placeholder="Describe the website you want..."></textarea>
+      <textarea id="codeEditor" spellcheck="false"></textarea>
+      <small class="hint">Tip: Edit HTML, CSS, or JS files directly. Preview rebuilds automatically when needed.</small>
+    </section>
+
+    <section class="panel preview">
+      <div class="panel-title">Website Preview</div>
+      <iframe id="previewFrame" title="website preview"></iframe>
+      <div id="publishOutput" class="publish-output hidden"></div>
+    </section>
+  </main>
+
+  <template id="publishedTemplate">
+    <div class="published-card">
+      <h2>Published 🎉</h2>
+      <p>Your website is now published locally and can be shared using this link:</p>
+      <a target="_blank" rel="noopener" id="publishedLink"></a>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
