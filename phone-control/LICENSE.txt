@@ -1,0 +1,7 @@
+This branch contains an adaptation inspired by the GPL-3.0-licensed
+wsong-nj/AccessDroid project.
+
+Original project:
+https://github.com/wsong-nj/AccessDroid
+
+The complete GPL-3.0 text remains available in that upstream repository.
