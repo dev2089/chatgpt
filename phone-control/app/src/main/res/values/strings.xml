@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phone Control</string>
+    <string name="service_name">Phone Control Accessibility</string>
+    <string name="app_status">Accessibility controller is prepared.</string>
+    <string name="open_accessibility">Open Accessibility Settings</string>
+</resources>
