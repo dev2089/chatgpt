@@ -1,0 +1,54 @@
+name: Build Phone Control APK
+
+on:
+  push:
+    branches:
+      - accessdroid-control-android11
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.13"
+
+      - name: Build debug APK
+        working-directory: phone-control
+        run: gradle --no-daemon assembleDebug
+
+      - name: Verify APK
+        working-directory: phone-control
+        run: |
+          test -s app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phone-control-android11
+          path: phone-control/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Publish installable release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: phone-control-build-${{ github.run_number }}
+          name: Phone Control Android 11 build ${{ github.run_number }}
+          prerelease: true
+          files: phone-control/app/build/outputs/apk/debug/app-debug.apk
