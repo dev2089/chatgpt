@@ -1,0 +1,16 @@
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "dev.devanshu.phonecontrol"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "dev.devanshu.phonecontrol"
+        minSdk = 30
+        targetSdk = 30
+        versionCode = 1
+        versionName = "1.0.0"
+    }
+}
