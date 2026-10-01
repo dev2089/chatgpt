@@ -1,0 +1,45 @@
+name: Sign Android 11 MCP APK
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  sign:
+    if: github.event.issue.pull_request == null && contains(github.event.comment.body, '[SIGN-ANDROID11-MCP]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download built unsigned APK
+        run: |
+          curl -fL --retry 5 --retry-delay 2             -o app-foss-release-unsigned.apk             https://github.com/dev2089/chatgpt/releases/download/android11-v1.12.0-chatgpt-2/app-foss-release-unsigned.apk
+          sha256sum app-foss-release-unsigned.apk
+
+      - name: Generate temporary signing key
+        run: |
+          keytool -genkeypair -v             -keystore android11-build.p12             -storetype PKCS12             -storepass android11             -keypass android11             -alias android11             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Android 11 Compatibility Build, O=ChatGPT"
+
+      - name: Sign APK
+        run: |
+          BUILD_TOOLS="$(ls -1d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          "$BUILD_TOOLS/apksigner" sign             --ks android11-build.p12             --ks-type PKCS12             --ks-pass pass:android11             --key-pass pass:android11             --out android-remote-control-mcp-android11-foss-signed.apk             app-foss-release-unsigned.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose android-remote-control-mcp-android11-foss-signed.apk
+          sha256sum android-remote-control-mcp-android11-foss-signed.apk
+          ls -lh android-remote-control-mcp-android11-foss-signed.apk
+
+      - name: Publish signed APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android11-v1.12.0-chatgpt-3
+          name: Android Remote Control MCP 1.12.0 Android 11 signed build
+          prerelease: true
+          generate_release_notes: false
+          files: android-remote-control-mcp-android11-foss-signed.apk
+          body: |
+            Signed distribution of the Android 11 compatibility build.
+            Source base: danielealbano/android-remote-control-mcp main at 16f39717ce0969aa81a4ec132ba1cad861ba46cc.
+            Compatibility patch: minSdk 33 -> 30.
+            FOSS flavor.
+            APK signed with a temporary CI-generated key for installation/testing.
+            Upstream officially supports Android 13+; Android 11 compatibility is unofficial.
