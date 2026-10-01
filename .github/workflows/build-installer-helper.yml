@@ -1,0 +1,32 @@
+name: Build PackageInstaller helper
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  build:
+    if: github.event.issue.pull_request == null && contains(github.event.comment.body, '[BUILD-INSTALLER-HELPER]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build DEX helper
+        run: |
+          mkdir -p out
+          javac -cp "$ANDROID_HOME/platforms/android-35/android.jar" -d out Installer.java
+          "$ANDROID_HOME/build-tools/35.0.0/d8"             --lib "$ANDROID_HOME/platforms/android-35/android.jar"             --output installer-dex out/Installer.class
+          mv installer-dex/classes.dex Installer.dex
+          sha256sum Installer.dex
+          ls -lh Installer.dex
+
+      - name: Publish helper
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: installer-helper-1
+          name: PackageInstaller helper
+          prerelease: true
+          generate_release_notes: false
+          files: Installer.dex
