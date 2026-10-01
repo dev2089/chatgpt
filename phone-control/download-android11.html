@@ -1,0 +1,19 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phone Control Android 11 APK</title>
+<style>body{font-family:system-ui;max-width:520px;margin:40px auto;padding:20px}button{font-size:18px;padding:14px 20px;border:0;border-radius:12px}p{line-height:1.5}</style>
+<h1>Phone Control Android 11</h1>
+<p>This downloads the custom Android 11 accessibility controller APK built for this setup.</p>
+<button id="d">Download APK</button>
+<script>
+const B64="H4sIAAAAAAAAA+29eXhTxfc/fubepPuStqxlC6XQFLqkpZSWRShtgdLS1i4sBS1pk7aRNglJurkg";
+document.getElementById('d').onclick=async()=>{
+ const bin=atob(B64), u8=new Uint8Array(bin.length);
+ for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+ const ds=new DecompressionStream('gzip');
+ const buf=await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer();
+ const blob=new Blob([buf],{type:'application/vnd.android.package-archive'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PhoneControl-Android11.apk'; a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+};
+</script>
