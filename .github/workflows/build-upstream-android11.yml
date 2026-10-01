@@ -33,6 +33,10 @@ jobs:
           p.write_text(s.replace(old, new, 1))
           print("Patched minSdk 33 -> 30")
 
+      - name: Install Rust Android targets
+        run: |
+          rustup target add aarch64-linux-android x86_64-linux-android
+
       - name: Build ngrok native dependencies
         working-directory: upstream
         run: |
