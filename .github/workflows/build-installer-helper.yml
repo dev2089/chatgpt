@@ -19,15 +19,16 @@ jobs:
           javac -cp "$ANDROID_HOME/platforms/android-35/android.jar" -d out Installer.java
           mkdir -p outdex
           "$ANDROID_HOME/build-tools/35.0.0/d8"             --lib "$ANDROID_HOME/platforms/android-35/android.jar"             --output outdex out/Installer.class
-          mv outdex/classes.dex Installer.dex
-          sha256sum Installer.dex
-          ls -lh Installer.dex
+          mv outdex/classes.dex classes.dex
+          jar cf Installer.jar classes.dex
+          sha256sum Installer.jar
+          ls -lh Installer.jar
 
       - name: Publish helper
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: installer-helper-3
+          tag_name: installer-helper-4
           name: PackageInstaller helper
           prerelease: true
           generate_release_notes: false
-          files: Installer.dex
+          files: Installer.jar
