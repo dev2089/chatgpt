@@ -11,12 +11,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout upstream
+      - name: Checkout upstream with submodules
         uses: actions/checkout@v4
         with:
           repository: danielealbano/android-remote-control-mcp
           path: upstream
           fetch-depth: 1
+          submodules: recursive
 
       - name: Patch minimum Android version
         working-directory: upstream
@@ -32,11 +33,16 @@ jobs:
           p.write_text(s.replace(old, new, 1))
           print("Patched minSdk 33 -> 30")
 
+      - name: Build ngrok native dependencies
+        working-directory: upstream
+        run: |
+          make compile-ngrok-native
+
       - name: Build FOSS release APK
         working-directory: upstream
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace -PVERSION_NAME=1.12.0-android11 -PVERSION_CODE=20120001 assembleFossRelease
+          ./gradlew --no-daemon --stacktrace -PVERSION_NAME=1.12.0-android11 -PVERSION_CODE=20120002 assembleFossRelease
 
       - name: Verify APK
         working-directory: upstream
@@ -47,13 +53,14 @@ jobs:
       - name: Publish APK release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: android11-v1.12.0-chatgpt-1
+          tag_name: android11-v1.12.0-chatgpt-2
           name: Android Remote Control MCP 1.12.0 for Android 11
           prerelease: true
           generate_release_notes: false
           files: upstream/app/build/outputs/apk/foss/release/*.apk
           body: |
             Built from danielealbano/android-remote-control-mcp main.
-            Compatibility patch: minSdk 33 -> 30 only.
+            Compatibility patch: minSdk 33 -> 30.
             FOSS build.
+            Includes upstream ngrok-java native build products required by the current source tree.
             This is an unofficial Android 11 compatibility build; upstream officially declares Android 13+.
