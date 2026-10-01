@@ -1,18 +1,21 @@
-import android.app.ActivityThread;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 public final class Installer {
     public static void main(String[] args) throws Exception {
         if (args.length != 1) throw new IllegalArgumentException("usage: Installer APK");
         String apk = args[0];
 
-        ActivityThread at = ActivityThread.systemMain();
-        Context system = at.getSystemContext();
+        Class<?> atClass = Class.forName("android.app.ActivityThread");
+        Method systemMain = atClass.getDeclaredMethod("systemMain");
+        Object at = systemMain.invoke(null);
+        Method getSystemContext = atClass.getDeclaredMethod("getSystemContext");
+        Context system = (Context) getSystemContext.invoke(at);
         Context ctx = system.createPackageContext("com.termux", Context.CONTEXT_IGNORE_SECURITY);
 
         PackageInstaller installer = ctx.getPackageManager().getPackageInstaller();
@@ -42,7 +45,6 @@ public final class Installer {
             PendingIntent pending = PendingIntent.getBroadcast(
                     ctx, sessionId, resultIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-
             session.commit(pending.getIntentSender());
             System.out.println("COMMIT session=" + sessionId);
         } finally {
