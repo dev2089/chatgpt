@@ -39,7 +39,7 @@ jobs:
         working-directory: upstream
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace assembleFossRelease
+          ./gradlew --no-daemon --stacktrace -PVERSION_NAME=1.12.0-android11 -PVERSION_CODE=20120000 assembleFossRelease
 
       - name: Show APK
         working-directory: upstream
