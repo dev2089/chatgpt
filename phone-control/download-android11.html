@@ -1,19 +1,32 @@
 <!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Phone Control Android 11 APK</title>
-<style>body{font-family:system-ui;max-width:520px;margin:40px auto;padding:20px}button{font-size:18px;padding:14px 20px;border:0;border-radius:12px}p{line-height:1.5}</style>
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:40px auto;padding:24px;line-height:1.5}
+button{font:inherit;font-weight:700;font-size:18px;padding:14px 22px;border:0;border-radius:12px}
+#s{margin-top:16px}
+</style>
 <h1>Phone Control Android 11</h1>
-<p>This downloads the custom Android 11 accessibility controller APK built for this setup.</p>
-<button id="d">Download APK</button>
+<p>Download the custom Android 11 accessibility controller APK.</p>
+<button id="d">Download APK</button><div id="s"></div>
 <script>
-const B64="H4sIAAAAAAAAA+29eXhTxfc/fubepPuStqxlC6XQFLqkpZSWRShtgdLS1i4sBS1pk7aRNglJurkg";
-document.getElementById('d').onclick=async()=>{
- const bin=atob(B64), u8=new Uint8Array(bin.length);
- for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
- const ds=new DecompressionStream('gzip');
- const buf=await new Response(new Blob([u8]).stream().pipeThrough(ds)).arrayBuffer();
- const blob=new Blob([buf],{type:'application/vnd.android.package-archive'});
- const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PhoneControl-Android11.apk'; a.click();
- setTimeout(()=>URL.revokeObjectURL(a.href),10000);
+const base="https://cdn.jsdelivr.net/gh/dev2089/chatgpt@accessdroid-control-android11/phone-control/apk-chunks/";
+const files=["chunk-00.b64","chunk-01.b64","chunk-02.b64","chunk-03.b64","chunk-04.b64","chunk-05.b64","chunk-06.b64"];
+const s=document.getElementById("s");
+document.getElementById("d").onclick=async()=>{
+  try{
+    s.textContent="Preparing APK…";
+    let b64="";
+    for(const f of files){ s.textContent="Loading "+f+"…"; b64+=await (await fetch(base+f,{cache:"no-store"})).text(); }
+    const bin=atob(b64), gz=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)gz[i]=bin.charCodeAt(i);
+    s.textContent="Building APK…";
+    const out=await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+    const blob=new Blob([out],{type:"application/vnd.android.package-archive"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download="PhoneControl-Android11.apk"; document.body.appendChild(a); a.click(); a.remove();
+    s.textContent="Download started.";
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
+  }catch(e){s.textContent="Download failed: "+e;}
 };
 </script>
