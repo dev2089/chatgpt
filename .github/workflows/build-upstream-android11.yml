@@ -1,0 +1,59 @@
+name: Build upstream Android Remote Control MCP for Android 11
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  build:
+    if: github.event.issue.pull_request == null && contains(github.event.comment.body, '[BUILD-ANDROID11-MCP]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout upstream
+        uses: actions/checkout@v4
+        with:
+          repository: danielealbano/android-remote-control-mcp
+          path: upstream
+          fetch-depth: 1
+
+      - name: Patch minimum Android version
+        working-directory: upstream
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("app/build.gradle.kts")
+          s = p.read_text()
+          old = "minSdk = 33"
+          new = "minSdk = 30"
+          if old not in s:
+              raise SystemExit("Expected minSdk = 33 not found")
+          p.write_text(s.replace(old, new, 1))
+          print("Patched minSdk 33 -> 30")
+
+      - name: Build FOSS release APK
+        working-directory: upstream
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace -PVERSION_NAME=1.12.0-android11 -PVERSION_CODE=20120001 assembleFossRelease
+
+      - name: Verify APK
+        working-directory: upstream
+        run: |
+          ls -lh app/build/outputs/apk/foss/release/*.apk
+          sha256sum app/build/outputs/apk/foss/release/*.apk
+
+      - name: Publish APK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android11-v1.12.0-chatgpt-1
+          name: Android Remote Control MCP 1.12.0 for Android 11
+          prerelease: true
+          generate_release_notes: false
+          files: upstream/app/build/outputs/apk/foss/release/*.apk
+          body: |
+            Built from danielealbano/android-remote-control-mcp main.
+            Compatibility patch: minSdk 33 -> 30 only.
+            FOSS build.
+            This is an unofficial Android 11 compatibility build; upstream officially declares Android 13+.
